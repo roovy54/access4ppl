@@ -1,0 +1,102 @@
+/*
+ * CSS for Accessible University Demo Site
+ * http://uw.edu/accesscomputing/AU
+ *
+ * main.css = Shared styles
+ */
+
+/*
+ * Overall structure
+ *
+ */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1em;
+  color: black;
+  background-color: #2A194C;
+  margin: 0;
+  padding: 0;
+}
+#content {
+  position: relative; 
+  width: 80%;
+  margin: 10px auto;
+  padding: 1em;
+  background: white;
+  border-left: 2px solid black;
+}
+
+/*
+ * HTML Elements
+ *
+ */
+a {
+  color: #3E0087;
+}
+
+/*
+ * Shared Form Styles
+ *
+ */
+
+form > div {
+  margin: 1em 0;
+}
+form input[type="text"] {
+  display: block;
+  width: 95%;
+}
+
+/*
+ *
+ * Custom Styles
+ *
+ */
+.section img {
+  float: left;
+  padding: 0 0.5em 0;
+}
+#errorMsg {
+  background-color: #FFFFCC;
+  border: 2px solid #39275B;
+  padding: 0.25em 0.75em;
+  font-weight: bold;
+  margin: 1em 0;
+  display: none;
+}
+
+/*
+ *
+ * Enrollment Table
+ *
+ */
+table#enrollment {
+  border: 1px solid black;
+  border-collapse: collapse;
+  margin-bottom: 1em;
+}
+table#enrollment th, table#enrollment td {
+  border: 1px solid black;
+  padding: 0.75em;
+  width: 3em;
+  text-align: center;
+}
+table td.corner { 
+  border-left: 1px solid white !important;
+  border-top: 1px solid white !important;
+}
+table#enrollment th { 
+  background-color: #f0ecf9;
+}
+
+/*
+ *
+ * Video
+ *
+ */
+ video { 
+  width: 100%;
+ }
+
+
+

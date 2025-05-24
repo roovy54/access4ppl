@@ -1,0 +1,9 @@
+[
+  "Text color #2A194C on background color #E9E9ED has insufficient contrast, making it difficult for users with visual impairments to read.",
+  "Color is used alone to indicate required fields with the class 'required', which may not be perceivable to users with color blindness.",
+  "There are no visible focus indicators on interactive elements like links and buttons, which can hinder keyboard navigation for users relying on keyboard input.",
+  "Fixed font sizes are used throughout the CSS, which may prevent users from resizing text according to their needs, affecting readability.",
+  "The use of absolute positioning for elements like the navigation menu and buttons may cause overlapping or hidden content, especially on smaller screens or with dynamic content.",
+  "The CSS does not include any animations or flashing elements, but care should be taken to ensure that any future animations do not trigger seizures in users with photosensitive epilepsy.",
+  "The design is somewhat responsive, but the use of fixed widths and floats may lead to usability issues on smaller devices, making it difficult for users to interact with content."
+]
