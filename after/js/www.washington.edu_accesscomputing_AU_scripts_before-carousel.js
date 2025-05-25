@@ -10,14 +10,18 @@ $(document).ready(function() {
 
   // add handlers for previous/next buttons
   var prevButton = $('#btn-prev'); 
-  prevButton.on('click', function() {
-      currentIndex = updateIndex(currentIndex, 'prev', slideCount);      
-      showSlide(currentIndex);
+  prevButton.on('click keydown', function(event) {
+      if (event.type === 'click' || event.key === 'Enter' || event.key === ' ') {
+          currentIndex = updateIndex(currentIndex, 'prev', slideCount);      
+          showSlide(currentIndex);
+      }
   });
   var nextButton = $('#btn-next');
-  nextButton.on('click', function() {
-      currentIndex = updateIndex(currentIndex, 'next', slideCount);
-      showSlide(currentIndex);
+  nextButton.on('click keydown', function(event) {
+      if (event.type === 'click' || event.key === 'Enter' || event.key === ' ') {
+          currentIndex = updateIndex(currentIndex, 'next', slideCount);
+          showSlide(currentIndex);
+      }
   });
 
   // add slide indicators (lentils)
@@ -27,11 +31,8 @@ $(document).ready(function() {
       .attr('role', 'button')
       .attr('tabindex', '0')
       .attr('data-slide', i)
-      .on('click', function() {
-        showSlide($(this).data('slide'));
-      })
-      .on('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
+      .on('click keydown', function(event) {
+        if (event.type === 'click' || event.key === 'Enter' || event.key === ' ') {
           showSlide($(this).data('slide'));
         }
       });
@@ -68,12 +69,9 @@ function showSlide(index) {
   $('.lentils li.active').removeClass('active');
   $('.lentils li').eq(index).addClass('active');
 
-  // Announce the change to assistive technologies
-  var liveRegion = $('<div aria-live="polite" style="position:absolute; left:-9999px;">Slide ' + (index + 1) + ' of ' + $('.slide').length + '</div>');
-  $('body').append(liveRegion);
-  setTimeout(function() {
-    liveRegion.remove();
-  }, 1000);
+  // Announce the new slide for screen readers
+  var slideTitle = $('.slide').eq(index).find('h2').text();
+  $('#aria-live-region').text(slideTitle);
 }
 
 function updateIndex(index, direction, count) {

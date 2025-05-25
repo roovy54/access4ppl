@@ -1,34 +1,18 @@
-[
-  {
-    "tool": "image_captioning_tool",
-    "file": "images/www.washington.edu_accesscomputing_AU_images_au123456789.gif"
-  },
-  {
-    "tool": "image_captioning_tool",
-    "file": "images/www.washington.edu_accesscomputing_AU_images_carousel_slide1.jpg"
-  },
-  {
-    "tool": "image_captioning_tool",
-    "file": "images/www.washington.edu_accesscomputing_AU_images_carousel_slide2.jpg"
-  },
-  {
-    "tool": "image_captioning_tool",
-    "file": "images/www.washington.edu_accesscomputing_AU_images_carousel_slide3.jpg"
-  },
-  {
-    "tool": "image_captioning_tool",
-    "file": "images/www.washington.edu_accesscomputing_AU_images_carousel_slide4.jpg"
-  },
-  {
-    "tool": "image_captioning_tool",
-    "file": "images/www.washington.edu_accesscomputing_AU_images_line_gradient.gif"
-  },
-  {
-    "tool": "image_captioning_tool",
-    "file": "images/www.washington.edu_accesscomputing_AU_images_captcha.png"
-  },
-  {
-    "tool": "video_transcription_tool",
-    "file": "UNKNOWN"
-  }
-]
+{
+  "image_captioning_tool": [
+    "images/www.washington.edu_accesscomputing_AU_images_carousel_slide1.jpg",
+    "images/www.washington.edu_accesscomputing_AU_images_carousel_slide2.jpg",
+    "images/www.washington.edu_accesscomputing_AU_images_carousel_slide3.jpg",
+    "images/www.washington.edu_accesscomputing_AU_images_carousel_slide4.jpg",
+    "images/www.washington.edu_accesscomputing_AU_images_captcha.png"
+  ],
+  "video_transcription_tool": [
+    "U",
+    "N",
+    "K",
+    "N",
+    "O",
+    "W",
+    "N"
+  ]
+}

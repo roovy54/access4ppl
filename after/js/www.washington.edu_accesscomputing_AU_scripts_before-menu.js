@@ -50,9 +50,9 @@ $(document).ready(function() {
     }
   });
 
-  // Add keyboard support for submenu items
-  $('#menu ul li a').on('keydown', function(e) {
-    if (e.key === 'Enter' || e.key === ' ') {
+  // Add keyboard interaction for submenu items
+  $('#menu ul li a').on('keydown', function(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
       $(this).click();
     }
   });

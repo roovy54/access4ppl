@@ -1,12 +1,3 @@
-
-/*
- * CSS for Accessible University Demo Site
- * http://uw.edu/accesscomputing/AU
- *
- * before-form.css = Styles unique to inaccessible form
- *    (shared form styles are in main.css)
- */
-
 #appForm div.heading {
   font-size: 1.6em;
   font-weight: normal;
@@ -37,7 +28,7 @@ form div.major {
  */
 .required {
   color: #39275B;
-  font-weight: bold; /* Added visual cue for required fields */
+  font-weight: bold;
 }
 
 /*
@@ -76,4 +67,3 @@ form div.major {
   font-size: 1.1em;
   font-weight: bold;
 }
-    

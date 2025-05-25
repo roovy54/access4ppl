@@ -28,13 +28,13 @@ class BaseAgent:
         ]
         response_text = self.call_llm(messages)
 
-        # Strip ```python and closing ``` fences if present exactly like that
+        # Strip ```python and closing ``` if present
         if response_text.startswith("```python"):
             response_text = response_text[len("```python") :].strip()
             if response_text.endswith("```"):
                 response_text = response_text[:-3].strip()
 
-        # Try to safely parse the response text as Python list
+        # Safely parse the list
         try:
             issues_list = eval(response_text, {"__builtins__": None}, {})
             if isinstance(issues_list, list):
@@ -43,7 +43,7 @@ class BaseAgent:
                 print("Warning: LLM response is not a list")
                 return [response_text]
         except Exception as e:
-            print(f"Error parsing LLM response as list: {e}")
+            print(f"Error parsing LLM response: {e}")
             return [response_text]
 
     def build_prompt(self, code_snippet: str) -> str:
@@ -65,51 +65,57 @@ class BaseAgent:
 class DomAgent(BaseAgent):
     def build_prompt(self, code_snippet: str) -> str:
         return (
-            "Analyze the following HTML code for accessibility issues. "
-            "Return a Python list of strings, each describing one accessibility issue in detail so that another system can understand and fix it easily. "
-            "Do NOT include severity levels, just a clear, concise description of the issue and the affected HTML element.\n\n"
+            "Analyze the following HTML code for **any and all** accessibility issues. "
+            "Be exhaustive and check for:\n"
+            "- Missing alt attributes on <img>\n"
+            "- Improper heading structure or skipped heading levels\n"
+            "- Non-semantic tags used instead of semantic ones\n"
+            "- Missing form labels or misassociated labels\n"
+            "- Inaccessible link text (e.g., 'click here')\n"
+            "- Visual-only cues\n"
+            "- Missing ARIA roles on landmarks\n"
+            "- Non-keyboard focusable elements\n"
+            "- Missing `lang` attribute or incorrect usage\n"
+            "- Tables missing headers or structure\n\n"
+            "Return only a **Python list of strings**, each one describing a unique accessibility issue and the element involved.\n\n"
             f"{code_snippet}\n\n"
-            "Example output format:\n"
-            "['Image element <img> missing alt text.', 'Heading levels are skipped or improperly nested.']"
+            "Example:\n['Image element <img> missing alt text.', 'Heading levels are skipped or improperly nested.']"
         )
 
 
 class CssAgent(BaseAgent):
     def build_prompt(self, code_snippet: str) -> str:
         return (
-            "Analyze the following CSS code for accessibility issues related to:\n"
-            "- Insufficient color contrast between text and background\n"
-            "- Using color alone to convey information\n"
-            "- Missing visible focus indicators on interactive elements\n"
-            "- Fixed font sizes that prevent resizing\n"
-            "- Overlapping or hidden content caused by positioning or z-index\n"
-            "- Animations or flashing that can trigger seizures\n"
-            "- Poor responsive design affecting usability\n"
-            "Return a Python list of strings, each describing one accessibility issue clearly and fully for easy understanding and future fixing. "
-            "Do NOT include severity levels.\n\n"
+            "Analyze the following CSS code for accessibility issues. Be thorough and check for:\n"
+            "- Insufficient contrast between text and background\n"
+            "- Use of color alone to convey information\n"
+            "- Hidden or removed focus indicators\n"
+            "- Fixed or absolute font sizes\n"
+            "- Content overlapping or hidden due to positioning/z-index\n"
+            "- Animations/flashing violating accessibility\n"
+            "- Lack of responsive design\n"
+            "- Use of background images for critical text\n\n"
+            "Return only a **Python list of strings**, each one describing an issue clearly and mentioning the CSS rule or selector involved.\n\n"
             f"{code_snippet}\n\n"
-            "Example output format:\n"
-            "['Text color #ccc on white background has insufficient contrast.', 'Focus outline removed from buttons making keyboard navigation hard.']"
+            "Example:\n['Text color #ccc on white background has insufficient contrast.', 'Focus outline removed from buttons.']"
         )
 
 
 class JsAgent(BaseAgent):
     def build_prompt(self, code_snippet: str) -> str:
         return (
-            "Analyze the following JavaScript code for accessibility issues such as:\n"
-            "- Dynamic content updates without ARIA live region announcements\n"
-            "- Custom controls missing keyboard support\n"
-            "- Improper focus management (focus not moved or trapped incorrectly)\n"
-            "- Event handlers that only respond to mouse events\n"
-            "- Missing or incorrect ARIA roles on interactive elements\n"
-            "- Use of alert(), confirm(), prompt() dialogs that disrupt accessibility\n"
-            "- Content changes not announced to assistive technologies\n"
-            "- Tab order issues due to dynamic element manipulation\n"
-            "Return a Python list of strings, each describing one issue clearly and fully for easy understanding and fixing. "
-            "Do NOT include severity levels.\n\n"
+            "Analyze the following JavaScript code for accessibility issues. Look for:\n"
+            "- Dynamic DOM updates without ARIA live region announcements\n"
+            "- Custom UI components lacking keyboard interaction\n"
+            "- Incorrect or missing focus management\n"
+            "- Mouse-only event listeners (e.g., click without keydown)\n"
+            "- Use of alert()/confirm() disrupting screen readers\n"
+            "- Incomplete ARIA roles/attributes\n"
+            "- Dynamic tab order issues\n"
+            "- Time-based or animated content that lacks user control\n\n"
+            "Return only a **Python list of strings**, each clearly describing a single accessibility issue and the JS behavior or element involved.\n\n"
             f"{code_snippet}\n\n"
-            "Example output format:\n"
-            "['Modal dialog does not move focus to itself when opened.', 'Custom dropdown does not support keyboard navigation.']"
+            "Example:\n['Custom dropdown lacks keyboard navigation.', 'Modal does not trap focus when opened.']"
         )
 
 
@@ -120,7 +126,7 @@ def chunk_text(text: str, max_tokens: int = 1500) -> list[str]:
     token_estimate = 0
 
     for line in lines:
-        token_estimate += len(line.split())  # crude token estimation
+        token_estimate += len(line.split())  # crude token estimate
         current_chunk.append(line)
         if token_estimate > max_tokens:
             chunks.append("\n".join(current_chunk))
@@ -174,37 +180,21 @@ if __name__ == "__main__":
     css_agent = CssAgent()
     js_agent = JsAgent()
 
-    # Analyze code snippets and get lists of issues
+    # Analyze code
     dom_issues = dom_agent.analyze(html_code)
     css_issues = css_agent.analyze(css_code)
     js_issues = []
     for chunk in js_chunks:
         js_issues.extend(js_agent.analyze(chunk))
 
-    # Now dom_issues, css_issues, js_issues are all python lists of strings
-    # You can process or save them as needed
-
-    # For demo, print nicely
-    # print("--- DOM Accessibility Issues ---")
-    # for issue in dom_issues:
-    #     print(f"- {issue}")
-
-    # print("\n--- CSS Accessibility Issues ---")
-    # for issue in css_issues:
-    #     print(f"- {issue}")
-
-    # print("\n--- JS Accessibility Issues ---")
-    # for issue in js_issues:
-    #     print(f"- {issue}")
-
-    # Save issues as JSON files
-    with open("accessibility_issues_html.json", "w", encoding="utf-8") as f:
+    # Save output
+    with open("before/accessibility_issues_html.json", "w", encoding="utf-8") as f:
         json.dump(dom_issues, f, indent=2, ensure_ascii=False)
 
-    with open("accessibility_issues_css.json", "w", encoding="utf-8") as f:
+    with open("before/accessibility_issues_css.json", "w", encoding="utf-8") as f:
         json.dump(css_issues, f, indent=2, ensure_ascii=False)
 
-    with open("accessibility_issues_js.json", "w", encoding="utf-8") as f:
+    with open("before/accessibility_issues_js.json", "w", encoding="utf-8") as f:
         json.dump(js_issues, f, indent=2, ensure_ascii=False)
 
-    print("Accessibility issues saved to JSON files in 'before/' folder.")
+    print("✅ Accessibility issues saved to JSON files in 'before/' folder.")

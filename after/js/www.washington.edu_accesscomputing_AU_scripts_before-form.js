@@ -7,14 +7,8 @@ $(document).ready(function(event) {
     var errorMsg = $('<p>')
       .text('Your form has errors. Please correct them and resubmit.');
     $('#error').html(heading).append(errorMsg).show();
-
-    // Announce the error message to assistive technologies
-    var liveRegion = $('<div aria-live="assertive" style="position:absolute; left:-9999px;">Your form has errors. Please correct them and resubmit.</div>');
-    $('body').append(liveRegion);
-    setTimeout(function() {
-      liveRegion.remove();
-    }, 1000);
-
+    // Announce the error message for screen readers
+    $('#aria-live-region').text('Your form has errors. Please correct them and resubmit.');
     event.preventDefault();
   });
 });

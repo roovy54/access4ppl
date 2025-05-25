@@ -12,9 +12,9 @@ $(document).ready(function(event) {
     hideModal();     
   });
 
-  // Add keyboard support for closing the modal
-  $(document).on('keydown', function(e) {
-    if (e.key === 'Escape') {
+  // handle keyboard interaction for modal
+  $(document).on('keydown', function(event) {
+    if (event.key === 'Escape') {
       hideModal();
     }
   });
@@ -34,7 +34,6 @@ $(document).ready(function(event) {
       .show();
 
     $('#modalMask').show();
-
     // Set focus to the modal
     $('#modalContent').attr('tabindex', '-1').focus();
   }

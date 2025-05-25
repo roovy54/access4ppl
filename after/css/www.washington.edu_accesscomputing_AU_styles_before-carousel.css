@@ -1,11 +1,3 @@
-
-/*
- * CSS for Accessible University Demo Site
- * http://uw.edu/accesscomputing/AU
- *
- * before-carousel.css = Styles for inaccessible carousel
- */
-
 #carousel {
   position: relative;
   background-color: #000;
@@ -90,4 +82,3 @@ ul.lentils {
   margin: 10px;
   background-color: #FF9; /* yellow */
 }
-    

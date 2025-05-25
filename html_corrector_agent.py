@@ -3,7 +3,7 @@ import json
 from openai import OpenAI
 from dotenv import load_dotenv
 
-# Load environment variables for OpenAI API key
+# Load environment variables from .env file
 load_dotenv()
 
 
@@ -27,20 +27,30 @@ class BaseAgent:
 
 class HtmlCorrectorAgent(BaseAgent):
     def build_prompt(
-        self, html_code: str, issues: list[str], image_captions: dict[str, str]
+        self,
+        html_code: str,
+        issues: list[str],
+        image_captions: dict[str, str] = {},
     ) -> str:
         issues_text = "\n".join(f"- {issue}" for issue in issues)
-        captions_text = "\n".join(
-            f"{filename}: {caption}" for filename, caption in image_captions.items()
+        captions_text = (
+            "\n".join(
+                f"{fname}: {caption}" for fname, caption in image_captions.items()
+            )
+            if image_captions
+            else "None"
         )
 
         return (
-            "You are an expert web developer specialized in accessibility.\n"
-            "Below are HTML accessibility issues and the HTML code. Your job is to fix only those issues "
-            "that can be addressed by editing HTML structure or attributes (e.g., adding labels, ARIA roles, skip links, lang tags).\n"
-            "Use the image captions provided to add meaningful alt text to <img> tags when appropriate.\n"
-            "DO NOT attempt to fix issues requiring video transcripts — ignore them.\n"
-            "Return only the corrected HTML string.\n\n"
+            "You are an expert web developer specialized in accessibility.\n\n"
+            "Your job is to fix **only** the HTML-based accessibility issues listed below.\n"
+            "These issues are related to structure, missing attributes, or semantic markup.\n\n"
+            "**Guidelines:**\n"
+            "- Do NOT fix issues requiring audio/video transcripts.\n"
+            "- Do NOT change any CSS or JavaScript logic.\n"
+            "- Use provided image captions to add descriptive `alt` text where `<img>` is missing it.\n"
+            "- Keep the structure and styling intact unless needed for fixing the issue.\n"
+            "- Do NOT introduce extra explanations. Just return the corrected HTML code.\n\n"
             f"Issues:\n{issues_text}\n\n"
             f"Image Captions:\n{captions_text}\n\n"
             f"HTML Code:\n{html_code}\n"
@@ -61,46 +71,48 @@ class HtmlCorrectorAgent(BaseAgent):
                 "role": "system",
                 "content": "You are an expert in accessible HTML coding.",
             },
-            {
-                "role": "user",
-                "content": prompt,
-            },
+            {"role": "user", "content": prompt},
         ]
 
         response_text = self.call_llm(messages)
 
-        # Remove ```html fences if present
+        # Remove code block fences if present
         if response_text.startswith("```html"):
             response_text = response_text[len("```html") :].strip()
-            if response_text.endswith("```"):
-                response_text = response_text[:-3].strip()
+        if response_text.endswith("```"):
+            response_text = response_text[:-3].strip()
 
         return {filename: response_text}
 
 
 if __name__ == "__main__":
     html_dir = "before"
-    issues_path = "accessibility_issues_html.json"
     output_dir = "after"
+    issues_path = os.path.join(html_dir, "accessibility_issues_html.json")
+    html_path = os.path.join(html_dir, "index.html")
 
     os.makedirs(output_dir, exist_ok=True)
 
-    # Read issues
+    # Load accessibility issues
     with open(issues_path, "r", encoding="utf-8") as f:
         issues = json.load(f)
 
-    # Read only index.html
-    html_path = os.path.join(html_dir, "index.html")
+    # Load HTML file
     with open(html_path, "r", encoding="utf-8") as f:
         html_code = f.read()
 
-    # Correct
-    agent = HtmlCorrectorAgent()
-    corrected = agent.analyze_and_correct({"index.html": html_code}, issues)
+    # Optional: Load image captions if available
+    image_captions = {}  # You can populate this dict with {filename: caption}
 
-    # Save corrected HTML
+    # Run correction
+    agent = HtmlCorrectorAgent()
+    corrected_html = agent.analyze_and_correct(
+        {"index.html": html_code}, issues, image_captions
+    )
+
+    # Save corrected file
     output_path = os.path.join(output_dir, "index.html")
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write(corrected["index.html"])
+        f.write(corrected_html["index.html"])
 
-    print(f"Corrected HTML written to: {output_path}")
+    print(f"✅ Corrected HTML written to: {output_path}")

@@ -50,13 +50,13 @@ class ImageCaptioningAgent:
         except Exception as e:
             return f"[Error generating alt text: {str(e)}]"
 
-    def process_images(
-        self, image_filenames: list[str], image_dir: str = "before/images"
-    ) -> dict[str, str]:
+    def process_images(self, image_paths: list[str]) -> dict[str, str]:
         result = {}
-        for filename in image_filenames:
-            full_path = os.path.join(image_dir, filename)
+        for rel_path in image_paths:
+            full_path = os.path.join(
+                "before", rel_path
+            )  # build full path from relative path
             print(f"🔎 Processing: {full_path}")
             caption = self.generate_alt_text(full_path)
-            result[filename] = caption
+            result[rel_path] = caption
         return result

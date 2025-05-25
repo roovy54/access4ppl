@@ -72,7 +72,7 @@ def generate_image_captions():
             issues = json.load(f)
 
         recommender = ExternalToolRecommenderAgent()
-        tool_tasks = recommender.analyze_issues(issues)
+        tool_tasks = recommender.recommend_tools(issues)  # use updated method
 
         os.makedirs("outputs/tools", exist_ok=True)
         with open("outputs/tools/external_tool_tasks.json", "w", encoding="utf-8") as f:
@@ -80,17 +80,15 @@ def generate_image_captions():
 
         print("✅ External tool tasks saved to outputs/tools/external_tool_tasks.json")
 
-        image_filenames = [
-            os.path.basename(task["file"])
-            for task in tool_tasks
-            if task["tool"] == "image_captioning_tool"
-        ]
+        # tool_tasks is dict: { "image_captioning_tool": [file1, file2], ... }
+        image_files = tool_tasks.get("image_captioning_tool", [])
 
-        if image_filenames:
+        if image_files:
             print("🧠 Running image captioning agent...")
             api_key = "sk-proj-..."  # Replace with your actual API key
             agent = ImageCaptioningAgent(api_key=api_key)
-            captions = agent.process_images(image_filenames, image_dir="before/images")
+            # Pass relative file paths as-is (like "images/filename.jpg")
+            captions = agent.process_images(image_files)
 
             os.makedirs("outputs/captions", exist_ok=True)
             with open(
